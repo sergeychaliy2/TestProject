@@ -1,35 +1,36 @@
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
+using BNG;
 
 public class ChangeColorOnGrab : MonoBehaviour
 {
-    private XRGrabInteractable grabInteractable;
+    private GrabbableUnityEvents grabbableUnityEvents;
     private Renderer objectRenderer;
     private Color originalColor;
     public Color grabColor = Color.red;
 
     private void Awake()
     {
-        grabInteractable = GetComponent<XRGrabInteractable>();
+        grabbableUnityEvents = GetComponent<GrabbableUnityEvents>();
         objectRenderer = GetComponent<Renderer>();
+
         if (objectRenderer != null)
         {
             originalColor = objectRenderer.material.color;
         }
 
-        // Add listener
-        grabInteractable.selectEntered.AddListener(OnGrab);
-        grabInteractable.selectExited.AddListener(OnRelease);
+        // Add listeners for grab and release events
+        grabbableUnityEvents.onGrab.AddListener(OnGrab);
+        grabbableUnityEvents.onRelease.AddListener(OnRelease);
     }
 
     private void OnDestroy()
     {
-        // Removing event handlers when an object is destroyed
-        grabInteractable.selectEntered.RemoveListener(OnGrab);
-        grabInteractable.selectExited.RemoveListener(OnRelease);
+        // Remove event handlers when the object is destroyed
+        grabbableUnityEvents.onGrab.RemoveListener(OnGrab);
+        grabbableUnityEvents.onRelease.RemoveListener(OnRelease);
     }
 
-    private void OnGrab(SelectEnterEventArgs args)
+    private void OnGrab(Grabber grabber)
     {
         if (objectRenderer != null)
         {
@@ -37,7 +38,7 @@ public class ChangeColorOnGrab : MonoBehaviour
         }
     }
 
-    private void OnRelease(SelectExitEventArgs args)
+    private void OnRelease()
     {
         if (objectRenderer != null)
         {
